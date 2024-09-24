@@ -1,5 +1,6 @@
 # EXPERIMENT--05-INTERFACING-A-4X4-MATRIX-KEYPAD-AND-DISPLAY-THE-OUTPUT-ON-LCD
-
+### NAME: VISHNU KM
+### REG.NO: 212223240185
 ## Aim: 
 To Interface a 4X4 matrix keypad and show the output on 16X2 LCD display to ARM controller , and simulate it in Proteus
 ## Components required: 
@@ -125,70 +126,98 @@ Jump to second line, position 2
  
 ## Procedure:
  1. click on STM 32 CUBE IDE, the following screen will appear 
- ![image](https://user-images.githubusercontent.com/36288975/226189166-ac10578c-c059-40e7-8b80-9f84f64bf088.png)
 
  2. click on FILE, click on new stm 32 project 
- ![image](https://user-images.githubusercontent.com/36288975/226189215-2d13ebfb-507f-44fc-b772-02232e97c0e3.png)
-![image](https://user-images.githubusercontent.com/36288975/226189230-bf2d90dd-9695-4aaf-b2a6-6d66454e81fc.png)
-3. select the target to be programmed  as shown below and click on next 
+3. select the target to be programmed and click on next 
 
-![image](https://user-images.githubusercontent.com/36288975/226189280-ed5dcf1d-dd8d-43ae-815d-491085f4863b.png)
 
-4.select the program name 
-![image](https://user-images.githubusercontent.com/36288975/226189316-09832a30-4d1a-4d4f-b8ad-2dc28f137711.png)
-
+4.select the program name
 
 5. corresponding ioc file will be generated automatically 
-![image](https://user-images.githubusercontent.com/36288975/226189378-3abbdee2-0df6-470f-a3cd-79c74e3d3ad8.png)
 
 6.select the appropriate pins as gipo, in or out, USART or required options and configure 
-![image](https://user-images.githubusercontent.com/36288975/226189403-f7179f1a-3eae-4637-826b-ab4ec35ba1e1.png)
-![image](https://user-images.githubusercontent.com/36288975/226189425-2b2414ce-49b3-4b61-a260-c658cb2e4152.png)
 
 
 7.click on cntrl+S , automaticall C program will be generated 
-![image](https://user-images.githubusercontent.com/36288975/226189443-8b43451d-0b14-47e4-a20b-cc09c6ad8458.png)
-![image](https://user-images.githubusercontent.com/36288975/226189450-85ffa969-2ffb-4788-81e5-72d60fdda0f1.png)
 8. edit the program and as per required 
-![image](https://user-images.githubusercontent.com/36288975/226189461-a573e62f-a109-4631-a250-a20925758fe0.png)
 
 9. Add necessary library files of LCD 16x2 , write the program and use project and build  
 
-![image](https://user-images.githubusercontent.com/36288975/226189554-3f7101ac-3f41-48fc-abc7-480bd6218dec.png)
 10. once the project is bulild 
-![image](https://user-images.githubusercontent.com/36288975/226189577-c61cc1eb-3990-4968-8aa6-aefffc766b70.png)
 
-11. click on debug option 
-![image](https://user-images.githubusercontent.com/36288975/226189625-37daa9a3-62e9-42b5-a5ce-2ac63345905b.png)
+11. click on debug option
 
 
 12.  Creating Proteus project and running the simulation
 We are now at the last part of step by step guide on how to simulate STM32 project in Proteus.
 
 13. Create a new Proteus project and place STM32F40xx i.e. the same MCU for which the project was created in STM32Cube IDE. 
-14. After creation of the circuit as per requirement as shown below 
-
-![image](https://user-images.githubusercontent.com/36288975/233856847-32bea88a-565f-4e01-9c7e-4f7ed546ddf6.png)
+14. After creation of the circuit as per requirement 
 
 14. Double click on the the MCU part to open settings. Next to the Program File option, give full path to the Hex file generated using STM32Cube IDE. Then set the external crystal frequency to 8M (i.e. 8 MHz). Click OK to save the changes.
 https://engineeringxpert.com/wp-content/uploads/2022/04/26.png
 
-15. click on debug and simulate using simulation as shown below 
-
-![image](https://user-images.githubusercontent.com/36288975/233856904-99eb708a-c907-4595-9025-c9dbd89b8879.png)
-
-## CIRCUIT DIAGRAM 
- 
+15. click on debug and simulate using simulation
 
 ## STM 32 CUBE PROGRAM :
+```
+#include "main.h"
+#include "stdbool.h"
+#include "lcd.h"
+bool col1,col2,col3,col4;
+void key()
+{
+	Lcd_PortType ports[] = { GPIOA, GPIOA, GPIOA, GPIOA };
+	Lcd_PinType pins[] = {GPIO_PIN_3, GPIO_PIN_2, GPIO_PIN_1, GPIO_PIN_0};
+	Lcd_HandleTypeDef lcd;
+	lcd = Lcd_create(ports, pins, GPIOB, GPIO_PIN_0, GPIOB, GPIO_PIN_1, LCD_4_BIT_MODE);
 
 
+	 HAL_GPIO_WritePin(GPIOC,GPIO_PIN_0,GPIO_PIN_RESET);
+	 HAL_GPIO_WritePin(GPIOC,GPIO_PIN_1,1);
+	 HAL_GPIO_WritePin(GPIOC,GPIO_PIN_2,1);
+	 HAL_GPIO_WritePin(GPIOC,GPIO_PIN_3,1);
+
+	 col1=HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_4);
+	 col2=HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_5);
+	 col3=HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_6);
+	 col4=HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_7);
+	 Lcd_cursor(&lcd,0,1);
+	 if(!col1)
+	 {
+		 Lcd_string(&lcd,"Key 7\n");
+	 }
+	 else if(!col2)
+	 {
+		 Lcd_string(&lcd,"Key 8\n");
+	 }
+	 else if(!col3)
+	 {
+		 Lcd_string(&lcd,"Key 9\n");
+	 }
+	  else if(!col4)
+	 {
+		  Lcd_string(&lcd,"Key %\n");
+	 }
+	 HAL_Delay(500);
+}
+int main(void)
+{
+  while (1)
+  {
+	  key();
+  }
+}
+
+```
 
 ## Output screen shots of proteus  :
  
- 
+![image](https://github.com/user-attachments/assets/6c24a995-f252-4018-8b9d-27b170a92b8e)
+
  ## CIRCUIT DIAGRAM (EXPORT THE GRAPHICS TO PDF AND ADD THE SCREEN SHOT HERE): 
- 
+  
+ ![image](https://github.com/user-attachments/assets/abdbe1d6-f119-42bb-b7ff-410c5bffc7a3)
  
 ## Result :
 Interfacing a 4x4 keypad with ARM microcontroller are simulated in proteus and the results are verified.
